@@ -1,0 +1,63 @@
+/* עיצוב כללי לטופס */
+form {
+  background-color: #fdfaf1; /* רקע בהיר ונעים */
+  padding: 40px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 350px;
+  margin: 50px auto;
+  box-shadow: 10px 10px 0px #ffcc00; /* צל קשיח וצבעוני בסגנון פופ-ארט */
+  border: 3px solid #333;
+}
+
+h2 {
+  font-family: 'Arial Black', sans-serif;
+  color: #ff5e5e;
+  text-transform: uppercase;
+  text-align: center;
+  font-size: 2.5rem;
+  margin: 0;
+  letter-spacing: 2px;
+}
+
+/* עיצוב השדות */
+input {
+  padding: 15px;
+  border: 3px solid #333;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  outline: none;
+  background-color: #fff;
+  transition: transform 0.2s;
+}
+
+input:focus {
+  transform: scale(1.02);
+  border-color: #4facfe; /* כחול בהיר */
+}
+
+/* עיצוב הכפתור */
+button {
+  padding: 15px;
+  background-color: #63d471; /* ירוק חי כמו בתמונה */
+  color: white;
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  border: 3px solid #333;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 5px 5px 0px #333;
+  transition: all 0.1s;
+}
+
+button:active {
+  transform: translate(3px, 3px);
+  box-shadow: 2px 2px 0px #333;
+}
+
+button:hover {
+  background-color: #52b05e;
+}

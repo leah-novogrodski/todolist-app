@@ -1,0 +1,113 @@
+/* פלטת צבעים מהתמונה: כחול, ורוד, ירוק, כתום, צהוב */
+
+body {
+  background-color: #fcf8e8; /* רקע שמנת כמו בתמונה */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+.todoapp {
+  background: white;
+  border: 4px solid #333;
+  box-shadow: 12px 12px 0px #ff6b6b; /* אפקט צל קשיח */
+  width: 400px;
+  padding: 20px;
+  border-radius: 0px; /* מראה גזום וישר */
+}
+
+h1 {
+  font-size: 60px;
+  text-align: center;
+  color: #4ecdc4;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  letter-spacing: -2px;
+  -webkit-text-stroke: 2px #333;
+}
+
+.new-todo {
+  width: 100%;
+  padding: 15px;
+  font-size: 18px;
+  border: 3px solid #333;
+  background: #ffe66d;
+  box-sizing: border-box;
+  outline: none;
+  font-weight: bold;
+}
+
+.new-todo::placeholder {
+  color: #333;
+  opacity: 0.6;
+}
+
+.todo-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+}
+
+.todo-item {
+  background: #a2d2ff;
+  margin-bottom: 10px;
+  border: 3px solid #333;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s;
+}
+
+.todo-item:nth-child(even) {
+  background: #ffafcc; /* צבע שונה לכל פריט שני */
+  transform: rotate(-1deg);
+}
+
+.todo-item:nth-child(odd) {
+  transform: rotate(1deg);
+}
+
+.todo-item.completed {
+  opacity: 0.6;
+  text-decoration: line-through;
+  background: #f0f0f0;
+}
+
+.view {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.view label {
+  flex-grow: 1;
+  font-weight: 900;
+  font-size: 20px;
+  color: #333;
+  margin-left: 10px;
+}
+
+input[type="checkbox"] {
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  accent-color: #333;
+}
+
+.destroy {
+  background: #ff6b6b;
+  border: 2px solid #333;
+  color: white;
+  cursor: pointer;
+  padding: 5px 10px;
+  font-weight: bold;
+}
+
+.destroy:after {
+  content: 'X';
+}
+
+.destroy:hover {
+  background: black;
+}
