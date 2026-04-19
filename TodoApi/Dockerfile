@@ -3,8 +3,9 @@ FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 WORKDIR /src
 
 # העתקת קובץ הפרויקט מתוך התיקייה הפנימית
-COPY ["TodoApi/TodoApi.csproj", "TodoApi/"]
-RUN dotnet restore "TodoApi/TodoApi.csproj"
+# במקום השורות הקודמות, נסי את זה בשלב ה-Build:
+COPY ["**/*.csproj", "./"]
+RUN dotnet restore
 
 # העתקת כל שאר הקבצים
 COPY . .
