@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // 1. הגדרות בסיס
-axios.defaults.baseURL = "http://localhost:5092";
+axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
 // 2. הוספת הטוקן אוטומטית לכל בקשה
 axios.interceptors.request.use(config => {
