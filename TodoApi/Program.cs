@@ -40,7 +40,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 var app = builder.Build();
-
+app.UseRouting();
 app.UseCors("ReactPolicy"); // ✅ חובה לציין את שם הפוליסי!
 
 app.UseAuthentication();
