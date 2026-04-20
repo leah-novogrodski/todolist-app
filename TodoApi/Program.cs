@@ -19,7 +19,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:3000",  "https://authclient-ip48.onrender.com")
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+               .AllowCredentials();
     });
 });
 
