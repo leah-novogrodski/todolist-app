@@ -17,7 +17,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReactPolicy", policy => // ✅ שם לפוליסי
     {
-        policy.WithOrigins("http://localhost:3000")
+        policy.WithOrigins("http://localhost:3000",  "https://authclient-ip48.onrender.com")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
