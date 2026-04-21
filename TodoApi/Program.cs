@@ -45,6 +45,8 @@ app.UseCors("ReactPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapMethods("{*path}", new[] { "OPTIONS" }, () => Results.Ok());
+
 
 app.MapGet("/todos", async (ToDoDbContext db, ClaimsPrincipal user) =>
 {
