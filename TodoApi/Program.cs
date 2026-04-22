@@ -11,8 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 // --- 1. הגדרת מסד נתונים ---
 builder.Services.AddDbContext<ToDoDbContext>(options =>
     options.UseMySql(
-        builder.Configuration.GetConnectionString("ToDoDB"),
-        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("ToDoDB"))
+        builder.Configuration.GetConnectionString("ToDoListDB"),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("ToDoListDB"))
     ));
 
 // --- 2. הגדרת CORS (פתרון סופי ל-Preflight) ---
