@@ -15,14 +15,12 @@ builder.Services.AddDbContext<ToDoDbContext>(options =>
     
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("ReactPolicy", policy => // ✅ שם לפוליסי
+    options.AddPolicy("ReactPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:3000",  "https://authclient-ip48.onrender.com")
+        policy.WithOrigins("http://localhost:3000", "https://authclient-ip48.onrender.com")
               .AllowAnyHeader()
               .AllowAnyMethod()
-               .AllowCredentials()
-                 .SetPreflightMaxAge(TimeSpan.FromMinutes(10)); // ✅ הוספת תמיכה ב-Credentials
-
+              .AllowCredentials(); // אם אתה שולח Cookies או Headers של Auth
     });
 });
 
@@ -41,6 +39,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 var app = builder.Build();
 app.UseRouting();
 app.UseCors("ReactPolicy"); 
