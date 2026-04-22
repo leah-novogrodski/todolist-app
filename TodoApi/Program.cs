@@ -20,7 +20,9 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("http://localhost:3000",  "https://authclient-ip48.onrender.com")
               .AllowAnyHeader()
               .AllowAnyMethod()
-               .AllowCredentials();
+               .AllowCredentials()
+                 .SetPreflightMaxAge(TimeSpan.FromMinutes(10)); // ✅ הוספת תמיכה ב-Credentials
+
     });
 });
 
