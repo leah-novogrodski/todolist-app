@@ -25,18 +25,17 @@ builder.Services.AddCors(options =>
 });
 
 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("my_super_secret_key_123456789012"));
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        policy =>
         {
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = securityKey
-        };
-    });
+            policy.WithOrigins("https://authclient-ip48.onrender.com") // הכתובת של הריאקט ב-Render
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials(); // חשוב מאוד אם אתה משתמש בטוקנים/עוגיות
+        });
+});
 
 builder.Services.AddAuthorization();
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
