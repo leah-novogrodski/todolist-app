@@ -145,5 +145,5 @@ app.MapDelete("/todos/{id}", async (int id, ToDoDbContext db, ClaimsPrincipal us
 }).RequireAuthorization();
 
 // ... כאן אפשר להוסיף את שאר ה-Put וה-Get לפי ה-id באותו פורמט ...
-
+app.MapGet("/test", () => Results.Ok("Server is working!")).AllowAnonymous();
 app.Run();
