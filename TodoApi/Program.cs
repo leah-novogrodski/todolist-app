@@ -7,12 +7,15 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// --- 1. הגדרת מסד נתונים ---
 builder.Services.AddDbContext<ToDoDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("ToDoDB"),
         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("ToDoDB"))
     ));
-    
+
+// --- 2. הגדרת CORS ---
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReactPolicy", policy =>
@@ -20,134 +23,59 @@ builder.Services.AddCors(options =>
         policy.WithOrigins("http://localhost:3000", "https://authclient-ip48.onrender.com")
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); // אם אתה שולח Cookies או Headers של Auth
+              .AllowCredentials();
     });
 });
 
-var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("my_super_secret_key_123456789012"));
-builder.Services.AddCors(options =>
+// --- 3. הגדרת אימות (Authentication) - זה מה שהיה חסר! ---
+var secretKey = "my_super_secret_key_123456789012"; // ודא שזה תואם למפתח ב-Login
+var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+
+builder.Services.AddAuthentication(options =>
 {
-    options.AddPolicy("AllowReactApp",
-        policy =>
-        {
-            policy.WithOrigins("https://authclient-ip48.onrender.com") // הכתובת של הריאקט ב-Render
-                  .AllowAnyHeader()
-                  .AllowAnyMethod()
-                  .AllowCredentials(); // חשוב מאוד אם אתה משתמש בטוקנים/עוגיות
-        });
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = securityKey,
+        ValidateIssuer = false,
+        ValidateAudience = false
+    };
 });
 
 builder.Services.AddAuthorization();
-var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+
+// הגדרת פורט ל-Render
+var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
 builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 var app = builder.Build();
+
+// --- 4. סדר ה-Middleware (קריטי מאוד!) ---
 app.UseRouting();
-app.UseCors("ReactPolicy"); 
 
+app.UseCors("ReactPolicy"); // חייב לבוא לפני הראוטים
 
-app.UseAuthorization();
+app.UseAuthentication(); // 1. מי המשתמש? (זה היה חסר)
+app.UseAuthorization();  // 2. מה מותר לו לעשות?
 
-
-app.MapGet("/todos", async (ToDoDbContext db, ClaimsPrincipal user) =>
-{
-    var userIdClaim = user.FindFirst("id")?.Value;
-    if (userIdClaim == null) return Results.Unauthorized();
-
-    int userId = int.Parse(userIdClaim);
-    var userTasks = await db.Items.Where(t => t.UserId == userId).ToListAsync();
-    return Results.Ok(userTasks);
+// --- 5. הראוטים שלך (נשארים אותו דבר) ---
+app.MapGet("/todos", async (ToDoDbContext db, ClaimsPrincipal user) => { 
+    /* הקוד שלך */ 
 }).RequireAuthorization();
 
-app.MapPost("/todos", async (Item item, ToDoDbContext db, ClaimsPrincipal user) =>
-{
-    var userIdClaim = user.FindFirst("id")?.Value;
-    if (userIdClaim == null) return Results.Unauthorized();
+// ... שאר ה-Endpoints (MapPost, MapPut וכו') ...
 
-    item.UserId = int.Parse(userIdClaim);
-    db.Items.Add(item);
-    await db.SaveChangesAsync();
-    return Results.Created($"/todos/{item.Id}", item);
-}).RequireAuthorization();
-
-app.MapPut("/todos/{id}", async (int id, Item input, ToDoDbContext db, ClaimsPrincipal user) =>
-{
-    // ✅ הוספת אימות משתמש
-    var userIdClaim = user.FindFirst("id")?.Value;
-    if (userIdClaim == null) return Results.Unauthorized();
-
-    var item = await db.Items.FindAsync(id);
-    if (item == null) return Results.NotFound();
-
-    // ✅ ודא שהמשימה שייכת למשתמש המחובר
-    if (item.UserId != int.Parse(userIdClaim)) return Results.Forbid();
-
-    item.Name = input.Name;
-    item.IsComplete = input.IsComplete;
-
-    await db.SaveChangesAsync();
-    return Results.Ok(item);
-}).RequireAuthorization(); // ✅ הוספת אימות
-
-app.MapDelete("/todos/{id}", async (int id, ToDoDbContext db, ClaimsPrincipal user) =>
-{
-    var userIdClaim = user.FindFirst("id")?.Value;
-    if (userIdClaim == null) return Results.Unauthorized();
-
-    var item = await db.Items.FindAsync(id);
-    if (item == null) return Results.NotFound();
-
-    // ✅ ודא שהמשימה שייכת למשתמש המחובר
-    if (item.UserId != int.Parse(userIdClaim)) return Results.Forbid();
-
-    db.Items.Remove(item);
-    await db.SaveChangesAsync();
-    return Results.NoContent();
-}).RequireAuthorization(); // ✅ הוספת אימות
-
-app.MapPost("/register", async (ToDoDbContext db, User newUser) =>
-{
-    if (db.Users.Any(u => u.name == newUser.name)) 
-        return Results.BadRequest("User already exists");
-
-    db.Users.Add(newUser);
-    await db.SaveChangesAsync();
-
-    var tokenHandler = new JwtSecurityTokenHandler();
-    var tokenDescriptor = new SecurityTokenDescriptor
-    {
-        Subject = new ClaimsIdentity(new[] { new Claim("id", newUser.id.ToString()) }),
-        Expires = DateTime.UtcNow.AddHours(1),
-        SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature)
-    };
-    
-    var token = tokenHandler.CreateToken(tokenDescriptor);
-    return Results.Ok(new { token = tokenHandler.WriteToken(token) });
+app.MapPost("/register", async (ToDoDbContext db, User newUser) => {
+    /* הקוד שלך */
 }).AllowAnonymous();
 
-app.MapPost("/login", (ToDoDbContext db, User userLogin) =>
-{
-    var user = db.Users.FirstOrDefault(u => u.name == userLogin.name && u.password == userLogin.password);
-    if (user == null) return Results.Unauthorized();
-
-    var tokenHandler = new JwtSecurityTokenHandler();
-    var tokenDescriptor = new SecurityTokenDescriptor
-    {
-        Subject = new ClaimsIdentity(new[] { new Claim("id", user.id.ToString()) }),
-        Expires = DateTime.UtcNow.AddHours(1),
-        SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature)
-    };
-    var token = tokenHandler.CreateToken(tokenDescriptor);
-    return Results.Ok(new { token = tokenHandler.WriteToken(token) });
+app.MapPost("/login", (ToDoDbContext db, User userLogin) => {
+    /* הקוד שלך */
 }).AllowAnonymous();
-app.MapGet("/todos/{id}", async (int id, ToDoDbContext db, ClaimsPrincipal user) =>
-{
-    var userIdClaim = user.FindFirst("id")?.Value;
-    if (userIdClaim == null) return Results.Unauthorized();
 
-    var item = await db.Items.FindAsync(id);
-    if (item == null) return Results.NotFound();
-    if (item.UserId != int.Parse(userIdClaim)) return Results.Forbid();
-
-    return Results.Ok(item);
-}).RequireAuthorization();
 app.Run();
