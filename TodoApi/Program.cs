@@ -44,7 +44,7 @@ var app = builder.Build();
 app.UseRouting();
 app.UseCors("ReactPolicy"); 
 
-app.UseAuthentication();
+
 app.UseAuthorization();
 
 
