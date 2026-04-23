@@ -16,16 +16,20 @@ builder.Services.AddDbContext<ToDoDbContext>(options =>
     ));
 
 // --- 2. הגדרת CORS (פתרון סופי ל-Preflight) ---
+// --- הגדרת ה-CORS המעודכנת ---
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("ReactPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "https://authclient-ip48.onrender.com")
+        policy.WithOrigins("https://authclient-ip48.onrender.com") // בלי לוכסן בסוף
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); // חובה אם ה-React שולח withCredentials: true
+              .AllowCredentials();
     });
 });
+
+// ... (ב-Middleware) ...
+
 
 // --- 3. הגדרת אימות (Authentication) ---
 var secretKey = "my_super_secret_key_123456789012"; 

@@ -26,18 +26,20 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  function login(token) {
+function login(token) {
     const payload = parseJwt(token);
-
-    localStorage.setItem("token", token);
+    // שמירה בעוגייה במקום ב-LocalStorage כדי שיהיה אחיד
+    document.cookie = `token=${token}; path=/; max-age=3600; SameSite=Strict`;
     setUser(payload);
     scheduleAutoLogout(payload.exp);
   }
 
   function logout() {
-    localStorage.removeItem("token");
+    // מחיקת העוגייה
+    document.cookie = "token=; path=/; max-age=0";
     setUser(null);
   }
+
 
   function scheduleAutoLogout(exp) {
     const delay = exp * 1000 - Date.now();
