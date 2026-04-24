@@ -28,10 +28,6 @@ builder.Services.AddCors(options =>
     });
 });
 
-// ... (ב-Middleware) ...
-
-
-// --- 3. הגדרת אימות (Authentication) ---
 var secretKey = "my_super_secret_key_123456789012"; 
 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
 
