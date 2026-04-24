@@ -68,7 +68,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 // --- 5. הגדרת ה-Endpoints ---
-
+app.MapGet("/", () => Results.Content("<h1>Server is Online!</h1>", "text/html"));
 // יצירת משתמש חדש
 app.MapPost("/register", async (ToDoDbContext db, User newUser) =>
 {
