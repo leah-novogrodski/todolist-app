@@ -55,25 +55,12 @@ var port = Environment.GetEnvironmentVariable("PORT") ?? "10000";
 builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
 var app = builder.Build();
-app.Use((context, next) =>
-{
-    // אם זו בקשת OPTIONS, פשוט תחזיר 200 OK עם הכותרות הנכונות
-    if (context.Request.Method == "OPTIONS")
-    {
-        context.Response.Headers.Add("Access-Control-Allow-Origin", "https://authclient-ip48.onrender.com");
-        context.Response.Headers.Add("Access-Control-Allow-Headers", "*");
-        context.Response.Headers.Add("Access-Control-Allow-Methods", "*");
-        context.Response.Headers.Add("Access-Control-Allow-Credentials", "true");
-        context.Response.StatusCode = 200;
-        return Task.CompletedTask;
-    }
-    return next();
-});
+app.UseRouting();
 
 // --- 4. סדר ה-Middleware (הסדר קריטי למניעת CORS Error) ---
 // ה-CORS חייב לבוא מיד אחרי Routing ולפני Authentication
 app.UseCors("ReactPolicy"); 
-app.UseRouting();
+
 
 
 
