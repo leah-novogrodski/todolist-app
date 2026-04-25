@@ -5,7 +5,7 @@ const API_URL = "https://authserver-wcxa.onrender.com";
 axios.defaults.baseURL = API_URL;
 
 // חובה להוסיף את זה כדי שיתאים ל-AllowCredentials בשרת!
-axios.defaults.withCredentials = true; 
+axios.defaults.withCredentials = false; 
 
 // הוספת הטוקן לכל בקשה
 axios.interceptors.request.use(config => {

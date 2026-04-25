@@ -23,8 +23,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("https://authclient-ip48.onrender.com") // בלי לוכסן בסוף
               .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
+              .AllowAnyMethod();
+             
     });
 });
 
@@ -66,7 +66,7 @@ app.UseCors("ReactPolicy");
 
 app.UseAuthentication(); 
 app.UseAuthorization();
-
+app.MapMethods("{*path}", new[] { "OPTIONS" }, () => Results.Ok());
 // --- 5. הגדרת ה-Endpoints ---
 app.MapGet("/", () => Results.Content("<h1>Server is Online!</h1>", "text/html"));
 // יצירת משתמש חדש
