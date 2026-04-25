@@ -60,7 +60,17 @@ app.UseRouting();
 // --- 4. סדר ה-Middleware (הסדר קריטי למניעת CORS Error) ---
 // ה-CORS חייב לבוא מיד אחרי Routing ולפני Authentication
 app.UseCors("ReactPolicy"); 
+app.Use(async (context, next) =>
+{
+    if (context.Request.Method == "OPTIONS")
+    {
+        context.Response.StatusCode = 200;
+        await context.Response.CompleteAsync();
+        return;
+    }
 
+    await next();
+});
 
 
 
