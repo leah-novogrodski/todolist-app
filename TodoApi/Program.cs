@@ -70,26 +70,29 @@ app.MapMethods("{*path}", new[] { "OPTIONS" }, () => Results.Ok());
 // --- 5. הגדרת ה-Endpoints ---
 app.MapGet("/", () => Results.Content("<h1>Server is Online!</h1>", "text/html"));
 // יצירת משתמש חדש
-app.MapPost("/register", async (ToDoDbContext db, User newUser) =>
-{
-    if (db.Users.Any(u => u.name == newUser.name)) 
-        return Results.BadRequest("User already exists");
+// app.MapPost("/register", async (ToDoDbContext db, User newUser) =>
+// {
+//     if (db.Users.Any(u => u.name == newUser.name)) 
+//         return Results.BadRequest("User already exists");
 
-    db.Users.Add(newUser);
-    await db.SaveChangesAsync();
+//     db.Users.Add(newUser);
+//     await db.SaveChangesAsync();
 
-    var tokenHandler = new JwtSecurityTokenHandler();
-    var tokenDescriptor = new SecurityTokenDescriptor
-    {
-        Subject = new ClaimsIdentity(new[] { new Claim("id", newUser.id.ToString()) }),
-        Expires = DateTime.UtcNow.AddHours(1),
-        SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature)
-    };
+//     var tokenHandler = new JwtSecurityTokenHandler();
+//     var tokenDescriptor = new SecurityTokenDescriptor
+//     {
+//         Subject = new ClaimsIdentity(new[] { new Claim("id", newUser.id.ToString()) }),
+//         Expires = DateTime.UtcNow.AddHours(1),
+//         SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature)
+//     };
     
-    var token = tokenHandler.CreateToken(tokenDescriptor);
-    return Results.Ok(new { token = tokenHandler.WriteToken(token) });
+//     var token = tokenHandler.CreateToken(tokenDescriptor);
+//     return Results.Ok(new { token = tokenHandler.WriteToken(token) });
+// }).AllowAnonymous();
+app.MapPost("/register", () =>
+{
+    return Results.Ok(new { token = "test" });
 }).AllowAnonymous();
-
 // התחברות
 app.MapPost("/login", (ToDoDbContext db, User userLogin) =>
 {
